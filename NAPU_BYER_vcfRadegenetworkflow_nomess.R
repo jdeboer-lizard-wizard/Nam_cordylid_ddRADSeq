@@ -1,4 +1,4 @@
-#Namazonurus pustulatus vcfR -> adegenet
+#Namazonurus pustulatus vcfR -> adegenet = Post-assemly filtering
 #By Jonathan DeBoer, Code sources from Nathan Byer
 #Start: 3-31-2021
 
@@ -7,38 +7,37 @@
 #######################################################
 
 #######packages and functions
-library(SNPRelate) #use R 4.0 work around to install (below)
-  #if (!requireNamespace("BiocManager", quietly = TRUE))
-  #  install.packages("BiocManager")
-  #BiocManager::install("SNPRelate")
 library(vcfR)
 library(adegenet)
 library(adegraphics)
-library(pegas)
-library(StAMPP)
-library(lattice)
-library(gplots)
-library(ape)
-library(ggmap)
-library(RColorBrewer)
-library(vegan)
-library(hierfstat)
-install.packages('hierfstat')
-library(apex)
-library(mmod)
-library(poppr)
-library(HWxtest)#removed from repository
-#install.packages('HWxtest')
-library(plyr)
-library(crunch)
 library(dartR)
-library("devtools")
-  #if (!requireNamespace("BiocManager", quietly = TRUE))
-  #  install.packages("BiocManager")
-  #BiocManager::install("qvalue")
-library(qvalue)
-install_github("zhengxwen/gdsfmt") #CHECK
-install_github("zhengxwen/SNPRelate")  #CHECK
+#library(SNPRelate) #use R 4.0 work around to install (below)
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+#  install.packages("BiocManager")
+#BiocManager::install("SNPRelate")
+#library(pegas)
+#library(StAMPP)
+#library(lattice)
+#library(gplots)
+#library(ape)
+#library(ggmap)
+#library(RColorBrewer)
+#library(vegan)
+#library(hierfstat)
+#install.packages('hierfstat')
+#library(apex)
+#library(mmod)
+#library(poppr)
+#library(HWxtest)#removed from repository -> github
+#install.packages('HWxtest')
+#library(plyr)
+#library(crunch)
+#library("devtools")
+#library(qvalue) #use R 4.0 work around to install (below)
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+#  install.packages("BiocManager")
+#BiocManager::install("qvalue")
+#install_github("zhengxwen/gdsfmt") #CHECK
 
 ###################################################
 ###    set working directory and read in vcf    ###
@@ -46,7 +45,7 @@ install_github("zhengxwen/SNPRelate")  #CHECK
 
 setwd("~/Desktop/cordylid_ddRADSeq/Napu_Floragenex_vcfs")
 vcfPR<-read.vcfR("201908201427napu0000_aligned_genotypes_standard.vcf")
-pop.data<-read.csv("PopData_400_020620.csv",header=T)
+pop.data<-read.csv("napu_popdata_filled_and_edited.csv",header=T)
 all(colnames(vcfPR@gt)[-1] == pop.data$Sample)
 
 #convert vcf to genlight
@@ -55,10 +54,8 @@ aa.genlight<-vcfR2genlight(vcfPR, n.cores = 4)
 ploidy(aa.genlight)<-2
 pop(aa.genlight)<-pop.data$Pop
 aa.genlight
-library(dartR)
 
-#keep the vcf if you want - I remove it to save RAM
-
+#Remove vcf to save RAM
 rm(vcfPR)
 
 ##now you can do all sorts of fun stuff with dartR! What follows is my own attempt to replicate
@@ -74,8 +71,8 @@ nLoc(aa.genlight)
 
 aa.genlight@other$loc.metrics<-data.frame(aa.genlight@loc.names)
 
-#put in the x-y data because why not?
-aa.genlight@other$longlat<-data.frame(pop.data$UTMW,pop.data$UTMN)
+#put in the x-y data because why not? -> comes with pop data
+aa.genlight@other$longlat<-data.frame(pop.data$long,pop.data$lat)
 
 #filter monomorphs (SNPs that do not vary at all)
 gl<-gl.filter.monomorphs(aa.genlight)
